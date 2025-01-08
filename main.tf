@@ -9,7 +9,7 @@ terraform {
 
 provider "yandex" {
   cloud_id = "b1g71e95h51okii30p25"
-  folder_id = "b1gb87u00c1covc5ttqv"
+  folder_id = var.FOLDER_ID
   service_account_key_file = "./keys/key.json"
 }
 
@@ -19,14 +19,21 @@ resource "yandex_function" "func" {
   runtime = "python312"
   entrypoint = "index.handler"
   memory = 128
+  execution_timeout = 50
 
   environment = {
     "TELEGRAM_BOT_TOKEN" = var.TELEGRAM_BOT_TOKEN
+    "FOLDER_ID" = var.FOLDER_ID
+    "SERVICE_ACCOUNT_API_KEY" = yandex_iam_service_account_api_key.sa_api_key.secret_key
   }
 
   content {
     zip_filename = archive_file.zip.output_path
   }
+}
+
+resource "yandex_iam_service_account_api_key" "sa_api_key" {
+  service_account_id = var.SERVICE_ACCOUNT_ID
 }
 
 output "func_url" {
@@ -36,6 +43,16 @@ output "func_url" {
 variable "TELEGRAM_BOT_TOKEN" {
   type = string
   description = "Ключ для бота в телеграме"
+}
+
+variable "SERVICE_ACCOUNT_ID" {
+  type = string
+  description = "Идентификатор сервисного аккаунта"
+}
+
+variable "FOLDER_ID" {
+  type = string
+  default = "Идентификатор папки"
 }
 
 resource "archive_file" "zip" {
