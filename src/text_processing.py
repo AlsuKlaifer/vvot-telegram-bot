@@ -1,6 +1,7 @@
 import requests
 import json
-from constants import YANDEX_GPT_API_URL, SERVICE_ACCOUNT_API_KEY, FOLDER_ID, RESPONSES
+from pathlib import Path
+from constants import YANDEX_GPT_API_URL, SERVICE_ACCOUNT_API_KEY, FOLDER_ID, RESPONSES, BUCKET_NAME, BUCKET_INSTRUCTIONS_FILE_KEY
 
 def handle_text_message(text):
     answer = get_answer_from_gpt(text)
@@ -22,7 +23,7 @@ def get_answer_from_gpt(text):
         "messages": [
             {
                 "role": "system",
-                "text": "Ты преподаватель по предмету Облачные технологии."
+                "text": get_object_from_bucket(BUCKET_INSTRUCTIONS_FILE_KEY)
             },
             {
                 "role": "user",
@@ -45,3 +46,12 @@ def get_answer_from_gpt(text):
         if alt.get("status") == "ALTERNATIVE_STATUS_FINAL":
             return alt["message"].get("text")
     return None
+
+def get_object_from_bucket(object_key):
+    try:
+        with open(Path("/function/storage", BUCKET_NAME, object_key), "r") as file:
+            content = file.read()
+        return content
+    except FileNotFoundError:
+        print("File not found in bucket", {"object_key": object_key})
+        return ""

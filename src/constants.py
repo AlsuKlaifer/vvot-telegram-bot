@@ -9,6 +9,8 @@ YANDEX_GPT_API_URL = "https://llm.api.cloud.yandex.net/foundationModels/v1/compl
 
 SERVICE_ACCOUNT_API_KEY = os.getenv("SERVICE_ACCOUNT_API_KEY")
 FOLDER_ID = os.getenv("FOLDER_ID")
+BUCKET_NAME = os.getenv("BUCKET_NAME")
+BUCKET_INSTRUCTIONS_FILE_KEY = os.getenv("BUCKET_INSTRUCTIONS_FILE_KEY")
 
 RESPONSES = {
     "description": (
